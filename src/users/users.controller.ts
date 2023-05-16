@@ -20,24 +20,16 @@ export class UsersController {
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    if (!createUserDto.first_name || !createUserDto.email)
-      throw new HttpException('Parametro Invalido', HttpStatus.BAD_REQUEST);
     return this.usersService.create(createUserDto);
   }
 
   @Get()
-  findAll(@Query() query) {
-    const limit = query;
-    console.log(limit);
-    const users = this.usersService.findAll();
-    return { status: 'success', payload: users };
-    // return this.usersService.findAll();
+  findAll() {
+    return this.usersService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    if (isNaN(+id))
-      throw new HttpException('Parametro Invalido', HttpStatus.BAD_REQUEST);
     return this.usersService.findOne(+id);
   }
 

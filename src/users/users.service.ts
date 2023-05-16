@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -13,22 +13,45 @@ export class UsersService {
   }
 
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    const { id, first_name, last_name, email } = createUserDto;
+    if (!id) throw new HttpException('Id is required', HttpStatus.BAD_REQUEST);
+    if (!first_name)
+      throw new HttpException('First name is required', HttpStatus.BAD_REQUEST);
+    if (!last_name)
+      throw new HttpException('Last name is required', HttpStatus.BAD_REQUEST);
+    if (!email)
+      throw new HttpException('Email is required', HttpStatus.BAD_REQUEST);
+
+    this.users.push(createUserDto);
+    return {
+      message: 'User created successfully',
+      user: createUserDto,
+    };
   }
 
-  findAll() {
-    return `This action returns all users`;
+  findAll(): User[] {
+    return this.users;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: number): User {
+    const user = this.users.find((user) => user.id === id);
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    const user = this.users.find((user) => user.id === id);
+    user.first_name = updateUserDto.first_name;
+    user.last_name = updateUserDto.last_name;
+    user.email = updateUserDto.email;
+    return {
+      message: `User with id ${id} updated successfully`,
+      user,
+    };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: number): object {
+    const userIndex = this.users.findIndex((user) => user.id === id);
+    this.users.splice(userIndex, 1);
+    return { message: `User with id ${id} deleted successfully` };
   }
 }
